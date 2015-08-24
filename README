@@ -1,4 +1,4 @@
-This is your new Play application
+Tokenator
 =================================
 
-This file will be packaged with your application, when using `activator dist`.
+A little app to generate bearer tokens for authenticated clients

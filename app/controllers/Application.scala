@@ -16,13 +16,6 @@ class Application @Inject() (tokenService: StormPathTokenService) extends Contro
   implicit val tokenFormat = Json.format[Token]
 
   def index = Action {
-    val apps = StormPathClient.applications
-    Logger.info(apps.toString())
-    val app = StormPathClient.forApplication("chorely-accounts-api")
-    app match {
-      case Some(application) => Logger.info(application.getName)
-      case None => Logger.info("No application found")
-    }
     Ok("Your new application is ready.")
   }
 
