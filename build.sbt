@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.15.1",
   "org.scalatest" % "scalatest_2.11" % "2.2.5",
   "org.scalatestplus" %% "play" % "1.4.0-M3" % "test",
-  "org.mockito" % "mockito-core" % "1.10.19"
+  "org.mockito" % "mockito-core" % "1.10.19",
+  "org.jscience" % "jscience" % "4.3.1"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
