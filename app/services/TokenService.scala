@@ -1,5 +1,6 @@
 package services
 
+import com.google.inject.ImplementedBy
 import com.stormpath.sdk.http.{HttpRequests, HttpMethod, HttpRequest}
 import com.stormpath.sdk.oauth.AccessTokenResult
 import play.api.Logger
@@ -12,8 +13,10 @@ import scala.collection.JavaConversions._
 
 case class Token(accessToken: String, tokenType: String, expiresIn: Int)
 
+@ImplementedBy(classOf[StormPathTokenService])
 trait TokenService {
   def retrieveToken[A](request: Request[A])(application: String): Try[Future[Token]]
+  def reloadApplications(): Unit
 }
 
 class StormPathTokenService extends TokenService {
@@ -29,7 +32,7 @@ class StormPathTokenService extends TokenService {
 
   override def retrieveToken[A](request: Request[A])(application: String): Try[Future[Token]] = {
     Try {
-      val maybeApplication = StormPathClient.forApplication(application)
+      val maybeApplication = StormpathClient().forApplication(application)
       maybeApplication match {
         case Some(app) =>
           val result: AccessTokenResult = app.authenticateApiRequest(toStormPathRequest(request)).asInstanceOf[AccessTokenResult]
@@ -40,6 +43,8 @@ class StormPathTokenService extends TokenService {
       }
     }
   }
+
+  override def reloadApplications(): Unit = StormpathClient().loadApps()
 
   private def toStormPathRequest[A](request: Request[A]): HttpRequest = {
     val headers = request.headers.toMap.mapValues(v => v.toArray)
@@ -55,4 +60,5 @@ class StormPathTokenService extends TokenService {
       case None => request.headers.toMap.mapValues(v => v.toArray)
     }
   }
+
 }

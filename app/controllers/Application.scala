@@ -1,6 +1,6 @@
 package controllers
 
-import services.{Token, StormPathTokenService}
+import services.{TokenService, Token, StormPathTokenService}
 
 import play.api.libs.json.Json
 import play.api._
@@ -11,7 +11,7 @@ import com.google.inject.Inject
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Application @Inject() (tokenService: StormPathTokenService) extends Controller {
+class Application @Inject() (tokenService: TokenService) extends Controller {
 
   implicit val tokenFormat = Json.format[Token]
 
@@ -28,6 +28,9 @@ class Application @Inject() (tokenService: StormPathTokenService) extends Contro
     }
   }
 
-  def refresh = TODO
+  def refresh = Action {
+    tokenService.reloadApplications()
+    Ok("Registered applications have been refreshed.")
+  }
 
 }

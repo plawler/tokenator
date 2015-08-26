@@ -13,7 +13,7 @@ import play.api.Play.current
 import scala.collection.JavaConversions._
 
 
-trait StormPathClient {
+trait StormpathClient {
   val apiKeyId = current.configuration.getString("stormpath.apikey.id").getOrElse("MISSING API ID")
   val apiKeySecret = current.configuration.getString("stormpath.apikey.secret").getOrElse("MISSING API SECRET")
   val appNameFilter = current.configuration.getString("stormpath.app.filter").getOrElse("")
@@ -34,16 +34,7 @@ trait StormPathClient {
       .build()
   }
 
-  val applications = {
-    val appMap = scala.collection.mutable.Map[String, String]()
-    val apps = client.getCurrentTenant.getApplications(Applications.where(Applications.name().startsWithIgnoreCase(appNameFilter)))
-    apps.foreach { application =>
-      Logger.info(s"Application name=${application.getName} href=${application.getHref}")
-      appMap += (application.getName -> application.getHref)
-
-    }
-    appMap
-  }
+  val applications = scala.collection.mutable.Map[String, String]()
 
   def forApplication(name: String): Option[Application] = {
     val href = applications.get(name)
@@ -53,11 +44,22 @@ trait StormPathClient {
     }
   }
 
+  def loadApps() = {
+    applications.empty
+    Logger.debug(s"App name filter: $appNameFilter")
+    val apps = client.getCurrentTenant.getApplications(Applications.where(Applications.name().startsWithIgnoreCase(appNameFilter)))
+    apps.foreach { application =>
+      Logger.info(s"Application name=${application.getName} href=${application.getHref}")
+      applications += (application.getName -> application.getHref)
+    }
+  }
+
 }
 
-object StormPathClient extends StormPathClient {
+object StormpathClient {
 
-  private lazy val instance = new StormPathClient {}
-  def apply = instance
+  private lazy val instance = new StormpathClient { loadApps() }
+
+  def apply() = instance
 
 }
